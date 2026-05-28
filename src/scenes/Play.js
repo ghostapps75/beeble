@@ -194,26 +194,46 @@ export default class Play extends Phaser.Scene {
     }
 
     createMobileControls() {
-        const width = this.cameras.main.width;
-        const height = this.cameras.main.height;
-
-        const leftBtn = this.add.circle(100, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(2000);
-        const rightBtn = this.add.circle(250, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(2000);
+        let controls = document.getElementById('mobile-controls');
+        if (!controls) return;
         
-        const shootBtn = this.add.circle(width - 250, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(2000);
-        const thrustBtn = this.add.circle(width - 100, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(2000);
+        // Clone to remove old event listeners
+        const newControls = controls.cloneNode(true);
+        controls.parentNode.replaceChild(newControls, controls);
+        controls = newControls;
+        
+        controls.style.display = 'flex';
 
-        const addTouch = (btn, action) => {
-            btn.setInteractive();
-            btn.setAlpha(0.3); // Semi-transparent
-            btn.on('pointerdown', () => { this.mobileInput[action] = true; btn.setAlpha(0.6); });
-            btn.on('pointerup', () => { this.mobileInput[action] = false; btn.setAlpha(0.3); });
-            btn.on('pointerout', () => { this.mobileInput[action] = false; btn.setAlpha(0.3); });
+        const bindBtn = (id, action) => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            
+            const press = (e) => {
+                if (e.cancelable) e.preventDefault();
+                this.mobileInput[action] = true;
+                btn.classList.add('active');
+            };
+            const release = (e) => {
+                if (e.cancelable) e.preventDefault();
+                this.mobileInput[action] = false;
+                btn.classList.remove('active');
+            };
+
+            btn.addEventListener('pointerdown', press);
+            btn.addEventListener('pointerup', release);
+            btn.addEventListener('pointercancel', release);
+            btn.addEventListener('pointerout', release);
+            btn.addEventListener('contextmenu', (e) => e.preventDefault());
         };
-        addTouch(leftBtn, 'left');
-        addTouch(rightBtn, 'right');
-        addTouch(thrustBtn, 'up');
-        addTouch(shootBtn, 'fire');
+
+        bindBtn('btn-left', 'left');
+        bindBtn('btn-right', 'right');
+        bindBtn('btn-thrust', 'up');
+        bindBtn('btn-shoot', 'fire');
+
+        this.events.once('shutdown', () => {
+            controls.style.display = 'none';
+        });
     }
 
     create1983HUD() {

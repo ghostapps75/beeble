@@ -13,3 +13,45 @@ body, html {
 #game-container {
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
 }
+
+/* Mobile DOM Controls */
+#mobile-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  width: 100vw;
+  pointer-events: none;
+  z-index: 9999;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.controls-left, .controls-right {
+  display: flex;
+  gap: 20px;
+  padding: 0 40px;
+  pointer-events: auto;
+}
+
+.control-btn {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: bold;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.control-btn.active {
+  background: rgba(255, 255, 255, 0.7);
+}
