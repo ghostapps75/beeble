@@ -8,11 +8,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         
         // Scale down the high-res 807x300 image
         this.setScale(0.18); 
-        
-        if (this.preFX) this.preFX.addBloom(0x00ffff, 1, 1, 2, 1.2);
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
+        
+        this.setDepth(100);
 
         // Physics properties - No Rotation!
         this.setCollideWorldBounds(true);
