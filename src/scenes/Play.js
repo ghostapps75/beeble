@@ -197,11 +197,11 @@ export default class Play extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
-        const leftBtn = this.add.circle(100, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(100);
-        const rightBtn = this.add.circle(250, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(100);
+        const leftBtn = this.add.circle(100, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(2000);
+        const rightBtn = this.add.circle(250, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(2000);
         
-        const shootBtn = this.add.circle(width - 250, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(100);
-        const thrustBtn = this.add.circle(width - 100, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(100);
+        const shootBtn = this.add.circle(width - 250, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(2000);
+        const thrustBtn = this.add.circle(width - 100, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(2000);
 
         const addTouch = (btn, action) => {
             btn.setInteractive();
