@@ -36,21 +36,23 @@ export default class Play extends Phaser.Scene {
         const playableHeight = height - hudHeight;
 
         // The absolute key: Force the cell height to fit strictly inside the playable height.
-        this.cellW = width / cols; 
+        this.cellW = width / 50; 
         this.cellH = playableHeight / rows; 
         
+        const worldWidth = cols * this.cellW;
+
         // --- Camera & Viewport Setup ---
         // Leave the physics world and camera at full 1080p width/height!
         // Because we squished cellH, the grid will naturally stop drawing at playableHeight.
-        this.physics.world.setBounds(0, 0, width, height);
-        this.cameras.main.setBounds(0, 0, width, height);
+        this.physics.world.setBounds(0, 0, worldWidth, height);
+        this.cameras.main.setBounds(0, 0, worldWidth, height);
         
         // Add the invisible floor so the ship physically bounces off the HUD.
-        this.invisibleFloor = this.add.rectangle(width / 2, playableHeight + 10, width, 20, 0x000000, 0);
+        this.invisibleFloor = this.add.rectangle(worldWidth / 2, playableHeight + 10, worldWidth, 20, 0x000000, 0);
         this.physics.add.existing(this.invisibleFloor, true);
         
         // --- Parallax Background ---
-        this.bg = this.add.tileSprite(0, 0, width, height, 'bg_nebula').setOrigin(0).setScrollFactor(0.2);
+        this.bg = this.add.tileSprite(0, 0, width, height, 'bg_nebula').setOrigin(0).setScrollFactor(0);
         
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
@@ -72,6 +74,9 @@ export default class Play extends Phaser.Scene {
         this.physics.add.collider(this.player, this.caveWalls);
         this.physics.add.collider(this.player, this.invisibleFloor);
         this.physics.add.overlap(this.player, this.hazards, this.fatalCollision, null, this);
+        this.physics.add.overlap(this.player, this.enemies, this.fatalCollision, null, this);
+        this.physics.add.overlap(this.lasers, this.enemies, (laser, enemy) => { laser.destroy(); enemy.destroyEnemy(); this.updateScore(150); }, null, this);
+        this.physics.add.collider(this.lasers, this.caveWalls, (laser) => { laser.destroy(); });
         this.physics.add.overlap(this.player, this.crystal, this.collectCrystal, null, this);
         this.physics.add.overlap(this.player, this.forcefield, this.winLevel, null, this);
 
@@ -170,6 +175,38 @@ export default class Play extends Phaser.Scene {
                     this.crystal = this.physics.add.sprite(x, y, 'crystal');
                     this.crystal.setScale(0.12);
                     this.crystal.body.setAllowGravity(false).setImmovable(true);
+                } else if (char === 'E') {
+                    new Bug(this, x, y);
+                } else if (char === 'T') {
+                    const haz = this.hazards.create(x, y, 'hazard_cube');
+                    haz.setDisplaySize(this.cellW * 0.5, this.cellH);
+                    haz.setOrigin(0.5, 0); // Grows downward
+                    
+                    // Sync hitbox
+                    haz.body.setSize(haz.width, haz.height);
+                    haz.body.updateFromGameObject();
+                    
+                    haz.body.setAllowGravity(false).setImmovable(true);
+                    
+                    // Visuals
+                    haz.setBlendMode(Phaser.BlendModes.ADD);
+                    haz.setTint(0xff00ff); // Magenta
+                    
+                    this.tweens.add({
+                        targets: haz,
+                        scaleY: { from: 1, to: 4 }, // Stretches to 4x its height
+                        duration: 150, // Extremely fast snapping attack
+                        hold: 500, // Holds the block for half a second
+                        yoyo: true, 
+                        yoyoEase: 'Sine.easeInOut',
+                        repeatDelay: 2000, // Waits 2 seconds before attacking again
+                        repeat: -1,
+                        onUpdate: () => {
+                            // Sync the physics hitbox dynamically as it stretches
+                            haz.body.setSize(haz.width, haz.height * haz.scaleY);
+                            haz.body.updateFromGameObject();
+                        }
+                    });
                 } else if (char === 'B') {
                     // CPU Base
                     this.forcefield = this.add.sprite(x, y, 'items', 0);
@@ -244,6 +281,10 @@ export default class Play extends Phaser.Scene {
     }
 
     update(time, delta) {
+        if (this.bg) {
+            this.bg.tilePositionX = this.cameras.main.scrollX * 0.2;
+        }
+
         if (this.isGameOver || this.isDying) return;
 
         if (this.player && !this.player.isDead) {

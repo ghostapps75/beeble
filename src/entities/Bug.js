@@ -18,7 +18,6 @@ export default class Bug extends Phaser.Physics.Arcade.Sprite {
         }
         
         this.play('bug_wiggle');
-        if (this.preFX) this.preFX.addBloom(0x00ff00, 1, 1, 2, 1.2);
         
         scene.add.existing(this);
         scene.physics.add.existing(this);
