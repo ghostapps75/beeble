@@ -3,10 +3,10 @@ import Phaser from 'phaser';
 export default class Bug extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
         super(scene, x, y, 'bug_sprites', 0);
-        
+
         // Scale high-res bug (~970px wide) down to a manageable size (~80px)
         this.setScale(0.08);
-        
+
         // Define Animations if needed
         if (!scene.anims.exists('bug_wiggle')) {
             scene.anims.create({
@@ -16,13 +16,13 @@ export default class Bug extends Phaser.Physics.Arcade.Sprite {
                 repeat: -1
             });
         }
-        
+
         this.play('bug_wiggle');
-        
+
         scene.add.existing(this);
         scene.physics.add.existing(this);
         scene.enemies.add(this);
-        
+
         // Tighten hitbox
         this.setBodySize(800, 400);
         this.setOffset(80, 40);

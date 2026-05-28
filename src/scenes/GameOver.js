@@ -69,7 +69,7 @@ export default class GameOver extends Phaser.Scene {
         }
 
         // 5. CTA Text
-        const restartText = this.add.text(width / 2, height / 2 + 250, 'PRESS [SPACE] FOR MAIN MENU', {
+        const restartText = this.add.text(width / 2, height / 2 + 250, 'PRESS [SPACE] OR TAP FOR MAIN MENU', {
             font: '40px monospace',
             fill: '#aaaaaa'
         }).setOrigin(0.5);
@@ -83,6 +83,12 @@ export default class GameOver extends Phaser.Scene {
         });
 
         this.input.keyboard.once('keydown-SPACE', () => {
+            this.cameras.main.fade(500, 0, 0, 0);
+            this.cameras.main.once('camerafadeoutcomplete', () => {
+                this.scene.start('Menu');
+            });
+        });
+        this.input.once('pointerdown', () => {
             this.cameras.main.fade(500, 0, 0, 0);
             this.cameras.main.once('camerafadeoutcomplete', () => {
                 this.scene.start('Menu');

@@ -60,14 +60,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         let drainRate = 15;
         let isThrusting = false;
+        const mobile = this.scene.mobileInput || {};
 
         // --- Horizontal Movement & Orientation ---
-        if (this.cursors.left.isDown || this.keys.A.isDown) {
+        if (this.cursors.left.isDown || this.keys.A.isDown || mobile.left) {
             this.setAccelerationX(-this.horizontalAcceleration);
             this.setFlipX(true);
             isThrusting = true;
             drainRate += 25; // Cumulative drain for horizontal
-        } else if (this.cursors.right.isDown || this.keys.D.isDown) {
+        } else if (this.cursors.right.isDown || this.keys.D.isDown || mobile.right) {
             this.setAccelerationX(this.horizontalAcceleration);
             this.setFlipX(false);
             isThrusting = true;
@@ -77,7 +78,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         // --- Vertical Thrust ---
-        if (this.cursors.up.isDown || this.keys.W.isDown) {
+        if (this.cursors.up.isDown || this.keys.W.isDown || mobile.up) {
             this.setAccelerationY(-this.thrustForce);
             isThrusting = true;
             drainRate += 50; // Cumulative drain for vertical
@@ -105,7 +106,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         // --- Shooting ---
-        if (Phaser.Input.Keyboard.JustDown(this.keys.SPACE)) {
+        if (Phaser.Input.Keyboard.JustDown(this.keys.SPACE) || mobile.fire) {
             this.fireLaser(time);
         }
     }

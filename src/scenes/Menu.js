@@ -28,7 +28,7 @@ export default class Menu extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // 4. CTA Text (Pulsing)
-        const ctaText = this.add.text(width / 2, height * (2 / 3), 'PRESS [SPACE] TO START', {
+        const ctaText = this.add.text(width / 2, height * (2 / 3), 'PRESS [SPACE] OR TAP TO START', {
             font: '50px monospace',
             fill: '#ffffff'
         }).setOrigin(0.5);
@@ -43,6 +43,9 @@ export default class Menu extends Phaser.Scene {
 
         // 5. Input Handling
         this.input.keyboard.once('keydown-SPACE', () => {
+            this.scene.start('Play', { levelIndex: 0, score: 0, lives: 3 });
+        });
+        this.input.once('pointerdown', () => {
             this.scene.start('Play', { levelIndex: 0, score: 0, lives: 3 });
         });
     }

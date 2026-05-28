@@ -84,6 +84,9 @@ export default class Play extends Phaser.Scene {
 
         // --- HUD ---
         this.create1983HUD();
+
+        this.mobileInput = { left: false, right: false, up: false, fire: false };
+        this.createMobileControls();
     }
 
     createLevelFromGrid() {
@@ -189,6 +192,30 @@ export default class Play extends Phaser.Scene {
             }
         }
     }
+
+    createMobileControls() {
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+
+        const leftBtn = this.add.circle(100, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(100);
+        const rightBtn = this.add.circle(250, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(100);
+        
+        const shootBtn = this.add.circle(width - 250, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(100);
+        const thrustBtn = this.add.circle(width - 100, height - 100, 50, 0xffffff).setScrollFactor(0).setDepth(100);
+
+        const addTouch = (btn, action) => {
+            btn.setInteractive();
+            btn.setAlpha(0.3); // Semi-transparent
+            btn.on('pointerdown', () => { this.mobileInput[action] = true; btn.setAlpha(0.6); });
+            btn.on('pointerup', () => { this.mobileInput[action] = false; btn.setAlpha(0.3); });
+            btn.on('pointerout', () => { this.mobileInput[action] = false; btn.setAlpha(0.3); });
+        };
+        addTouch(leftBtn, 'left');
+        addTouch(rightBtn, 'right');
+        addTouch(thrustBtn, 'up');
+        addTouch(shootBtn, 'fire');
+    }
+
     create1983HUD() {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
