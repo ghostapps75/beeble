@@ -136,39 +136,34 @@ export default class Play extends Phaser.Scene {
                         }
                     });
                 } else if (char === 'M') {
-                    // Moving hazard block
                     const haz = this.hazards.create(x, y, 'hazard_cube');
-                    haz.setDisplaySize(this.cellW * 1.5, this.cellH * 1.5);
+                    // Scale it to be 1 cell wide, but 3 cells tall to plug the entire shaft
+                    haz.setDisplaySize(this.cellW, this.cellH * 3.5); 
                     
-                    // Sync hitbox
                     haz.body.setSize(haz.width, haz.height);
                     haz.body.updateFromGameObject();
-                    
                     haz.body.setAllowGravity(false).setImmovable(true);
                     
-                    // Radioactive visuals
                     haz.setBlendMode(Phaser.BlendModes.ADD);
-                    haz.setTint(0x00ffff);
+                    haz.setTint(0x00ffff); // Keep the classic white/cyan glow
                     
+                    // Throbbing radiation effect
                     this.tweens.add({
                         targets: haz,
-                        alpha: { from: 0.5, to: 1.0 },
+                        alpha: { from: 0.6, to: 1.0 },
                         duration: 200,
                         yoyo: true,
-                        repeat: -1,
-                        onUpdate: () => {
-                            haz.setTint(Math.random() > 0.5 ? 0x00ffff : 0xffffff);
-                        }
+                        repeat: -1
                     });
-                    
-                    // Patrol movement tween
+
+                    // Massive Horizontal Patrol across the long tunnel
                     this.tweens.add({
                         targets: haz,
-                        x: x + (this.cellW * 18), 
-                        duration: 4000,
+                        x: x + (this.cellW * 65), // Sweeps across 65 columns
+                        duration: 9000, // Slow, relentless sweep
                         yoyo: true,
                         repeat: -1,
-                        ease: 'Sine.easeInOut'
+                        ease: 'Linear'
                     });
                 } else if (char === 'C') {
                     // Crystal
@@ -177,36 +172,6 @@ export default class Play extends Phaser.Scene {
                     this.crystal.body.setAllowGravity(false).setImmovable(true);
                 } else if (char === 'E') {
                     new Bug(this, x, y);
-                } else if (char === 'T') {
-                    const haz = this.hazards.create(x, y, 'hazard_cube');
-                    haz.setDisplaySize(this.cellW * 0.5, this.cellH);
-                    haz.setOrigin(0.5, 0); // Grows downward
-                    
-                    // Sync hitbox
-                    haz.body.setSize(haz.width, haz.height);
-                    haz.body.updateFromGameObject();
-                    
-                    haz.body.setAllowGravity(false).setImmovable(true);
-                    
-                    // Visuals
-                    haz.setBlendMode(Phaser.BlendModes.ADD);
-                    haz.setTint(0xff00ff); // Magenta
-                    
-                    this.tweens.add({
-                        targets: haz,
-                        scaleY: { from: 1, to: 4 }, // Stretches to 4x its height
-                        duration: 150, // Extremely fast snapping attack
-                        hold: 500, // Holds the block for half a second
-                        yoyo: true, 
-                        yoyoEase: 'Sine.easeInOut',
-                        repeatDelay: 2000, // Waits 2 seconds before attacking again
-                        repeat: -1,
-                        onUpdate: () => {
-                            // Sync the physics hitbox dynamically as it stretches
-                            haz.body.setSize(haz.width, haz.height * haz.scaleY);
-                            haz.body.updateFromGameObject();
-                        }
-                    });
                 } else if (char === 'B') {
                     // CPU Base
                     this.forcefield = this.add.sprite(x, y, 'items', 0);
