@@ -9,29 +9,24 @@ export default class Menu extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
-        // 1. Scrolling Background
-        this.bg = this.add.tileSprite(0, 0, width, height, 'bg_nebula').setOrigin(0);
+        // 1. Background Cover Art
+        this.bg = this.add.image(width / 2, height / 2, 'cover_art');
+        const scaleX = width / this.bg.width;
+        const scaleY = height / this.bg.height;
+        this.bg.setScale(Math.max(scaleX, scaleY));
 
-        // 2. Title Text (Massive, crisp, cyan bloom)
-        const title = this.add.text(width / 2, height / 3, 'CAPTAIN BEEBLE 26', {
-            font: 'bold 120px monospace',
-            fill: '#00ffff'
-        }).setOrigin(0.5);
-        
-        if (title.preFX) title.preFX.addBloom(0x00ffff, 1, 1, 2, 1.5);
-
-        // 3. High Score Text (Below title)
+        // 2. High Score Text (Lower right)
         const highScore = localStorage.getItem('captainBeebleHighScore') || 0;
-        this.add.text(width / 2, (height / 3) + 120, `HIGH SCORE: ${highScore}`, {
-            font: '40px monospace',
+        this.add.text(width - 150, height - 200, `HIGH SCORE: ${highScore}`, {
+            font: '30px monospace',
             fill: '#ffaa00'
-        }).setOrigin(0.5);
+        }).setOrigin(1, 0.5);
 
-        // 4. CTA Text (Pulsing)
-        const ctaText = this.add.text(width / 2, height * (2 / 3), 'PRESS [SPACE] OR TAP TO START', {
-            font: '50px monospace',
+        // 3. CTA Text (Lower right, pulsing)
+        const ctaText = this.add.text(width - 150, height - 150, 'PRESS [SPACE] OR TAP TO START', {
+            font: '30px monospace',
             fill: '#ffffff'
-        }).setOrigin(0.5);
+        }).setOrigin(1, 0.5);
 
         this.tweens.add({
             targets: ctaText,
@@ -41,19 +36,21 @@ export default class Menu extends Phaser.Scene {
             repeat: -1
         });
 
-        // 5. Input Handling
+        // 4. Input Handling
         this.input.keyboard.once('keydown-SPACE', () => {
             this.scene.start('Play', { levelIndex: 0, score: 0, lives: 3 });
         });
         this.input.once('pointerdown', () => {
             this.scene.start('Play', { levelIndex: 0, score: 0, lives: 3 });
         });
+        
+        // Developer shortcut to start at Level 2
+        this.input.keyboard.once('keydown-TWO', () => {
+            this.scene.start('Play', { levelIndex: 1, score: 0, lives: 3 });
+        });
     }
 
     update() {
-        // Scroll the background tile to give the menu motion
-        if (this.bg) {
-            this.bg.tilePositionX += 0.5;
-        }
+        // No scrolling needed for static cover art
     }
 }

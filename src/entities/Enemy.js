@@ -21,11 +21,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.isPatrolling = isPatrolling;
 
         if (this.isPatrolling) {
-            // Simple horizontal patrol tween
+            // Wider horizontal patrol tween
             scene.tweens.add({
                 targets: this,
-                x: x + 100,
-                duration: 2000,
+                x: x + 350, 
+                duration: 3500,
                 yoyo: true,
                 repeat: -1,
                 ease: 'Sine.easeInOut'

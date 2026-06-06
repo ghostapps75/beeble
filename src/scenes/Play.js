@@ -14,12 +14,17 @@ export default class Play extends Phaser.Scene {
         this.levelIndex = data.levelIndex || 0;
         this.score = data.score || 0;
         this.lives = data.lives !== undefined ? data.lives : 3;
+        this.vMult = 1.6;
+        this.wMult = 0.9;
+        this.uMult = 0.7;
+        this.mMult = 1.6;
     }
 
     create() {
         const levelData = levels[this.levelIndex];
         this.levelData = levelData;
         this.hasCrystal = false;
+        this.crystal = null;
         this.isGameOver = false;
         this.isDying = false; // New flag for fatal collision freeze
         this.escapeTimeMax = levelData.escapeTime || 40;
@@ -97,7 +102,7 @@ export default class Play extends Phaser.Scene {
             this.destroyWall(wall);
             
             const newCrystal = this.physics.add.sprite(wx, wy, 'gem_icon');
-            newCrystal.setDisplaySize(this.cellW * 5, this.cellH * 5); // MASSIVE Crystal
+            newCrystal.setDisplaySize(this.cellW * 2, this.cellH * 2); // 2x2 Crystal
             newCrystal.setBlendMode(Phaser.BlendModes.ADD);
             newCrystal.body.setAllowGravity(false).setImmovable(true);
             this.crystalsGroup.add(newCrystal);
@@ -181,20 +186,42 @@ export default class Play extends Phaser.Scene {
                     wall.visual = rock;
                     if (char === 'D') this.destructibleWalls.add(wall);
                     else this.destructibleCrystalWalls.add(wall);
-                } else if (char === 'W') {
-                    const haz = this.hazards.create(x, y, 'hazard_cube');
-                    haz.setDisplaySize(this.cellW * 5, this.cellH * 5); // 5x5 Grid Cells
-                    haz.body.setAllowGravity(false).setImmovable(true);
-                    this.tweens.add({ targets: haz, alpha: { from: 0.5, to: 1.0 }, duration: 400, yoyo: true, repeat: -1 });
                 } else if (char === 'M') {
                     const haz = this.hazards.create(x, y, 'hazard_block');
-                    haz.setDisplaySize(this.cellW * 8, this.cellH * 8); // MASSIVE 8x8 moving wall
+                    haz.setDisplaySize(this.cellW * 8, this.cellH * 8);
                     haz.body.setAllowGravity(false).setImmovable(true);
                     this.tweens.add({ targets: haz, alpha: { from: 0.6, to: 1.0 }, duration: 400, yoyo: true, repeat: -1 });
-                    this.tweens.add({ targets: haz, x: x + (this.cellW * 40), duration: 8000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+
+                    // Dynamic duration for the horizontal block
+                    this.tweens.add({ targets: haz, x: x + (this.cellW * 160), duration: 22000 / this.mMult, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+                } else if (char === 'V' || char === 'W' || char === 'U') {
+                    const haz = this.hazards.create(x, y, 'hazard_block');
+                    haz.setDisplaySize(this.cellW * 8, this.cellH * 8); 
+                    haz.body.setAllowGravity(false).setImmovable(true);
+                    this.tweens.add({ targets: haz, alpha: { from: 0.6, to: 1.0 }, duration: 400, yoyo: true, repeat: -1 });
+                    
+                    // Base durations divided by the Dev Tool multipliers
+                    const baseDuration = (char === 'V' || char === 'W') ? 2500 : 1500;
+                    const mult = char === 'V' ? this.vMult : (char === 'W' ? this.wMult : this.uMult);
+                    const finalDuration = baseDuration / mult;
+                    
+                    // Calculate exact drop distances to hit the varying floor heights below them
+                    let dropCells = 10.5;
+                    if (char === 'V') dropCells = 9.5;
+                    else if (char === 'W') dropCells = 10.5;
+                    else if (char === 'U') dropCells = 6.5;
+                    
+                    this.tweens.add({ 
+                        targets: haz, 
+                        y: y + (this.cellH * dropCells), 
+                        duration: finalDuration, 
+                        yoyo: true, 
+                        repeat: -1, 
+                        ease: 'Sine.easeInOut' 
+                    });
                 } else if (char === 'C') {
                     const newCrystal = this.physics.add.sprite(x, y, 'gem_icon');
-                    newCrystal.setDisplaySize(this.cellW * 5, this.cellH * 5); // 5x5 Highly Visible Crystal
+                    newCrystal.setDisplaySize(this.cellW * 2, this.cellH * 2); // 2x2 Crystal
                     newCrystal.setBlendMode(Phaser.BlendModes.ADD);
                     newCrystal.body.setAllowGravity(false).setImmovable(true);
                     this.crystalsGroup.add(newCrystal);
@@ -206,7 +233,7 @@ export default class Play extends Phaser.Scene {
                 } else if (char === 'B') {
                     this.forcefield = this.add.sprite(x, y, 'cpu_block');
                     this.forcefield.setDisplaySize(this.cellW * 8, this.cellH * 8); // Giant Safe Zone Base
-                    this.forcefield.setTint(0x0088ff);
+                    this.forcefield.setTint(0x00ff00);
                     this.physics.add.existing(this.forcefield, true);
                 } else if (char === 'S') {
                     // Player Start
@@ -353,7 +380,16 @@ export default class Play extends Phaser.Scene {
         this.updateScore(1000);
 
         // Transition to next level or win screen
-        this.scene.start('GameOver', { score: this.score, win: true });
+        if (this.levelIndex + 1 < levels.length) {
+            this.scene.start('Play', { 
+                levelIndex: this.levelIndex + 1, 
+                score: this.score, 
+                lives: this.lives
+            });
+        } else {
+            Soundscape.setThrusting(false);
+            this.scene.start('GameOver', { score: this.score, win: true });
+        }
     }
 
     handleWallCollision(player, wall) {
@@ -395,13 +431,15 @@ export default class Play extends Phaser.Scene {
             if (this.lives > 0) {
                 this.player.respawn(this.startX, this.startY);
                 this.hasCrystal = false;
-                // This null check prevents the game-breaking crash
-                if (this.crystal) {
+
+                // THE FIX: Check if the crystal is actually an active object!
+                if (this.crystal && this.crystal.active) {
                     this.crystal.setVisible(true);
                     this.crystal.body.enable = true;
                 }
             } else {
                 this.isGameOver = true;
+                Soundscape.setThrusting(false);
                 this.scene.start('GameOver', { score: this.score, win: false });
             }
         });

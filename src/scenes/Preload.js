@@ -23,6 +23,7 @@ export default class Preload extends Phaser.Scene {
 
         // Load Assets
         this.load.image('bg_nebula', '/assets/bg_nebula.jpg');
+        this.load.image('cover_art', '/assets/cover_art.jpg');
         this.load.image('player', '/assets/player.png');
         this.load.image('rock_tile', '/assets/rock_tile.png');
         this.load.image('rock_tile2', '/assets/rock_tile2.png');

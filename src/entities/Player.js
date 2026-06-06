@@ -6,23 +6,23 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
         super(scene, x, y, 'player');
         
-        // Scale down the high-res 1254x1254 image
-        this.setScale(0.18); 
+        // Scale down the high-res image (Increased by ~10% per your request)
+        this.setScale(0.09);
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        
+
         this.setDepth(100);
 
-        // Physics properties - No Rotation!
         this.setCollideWorldBounds(true);
-        this.setBounce(0.3); 
-        // --- DIALED-IN ARCADE PHYSICS ---
+        this.setBounce(0.3);
+
+        // --- DIALED-IN FLOATY ARCADE PHYSICS ---
         this.setDrag(120, 0);          // Zero vertical drag so you fall smoothly
-        this.body.setGravityY(500);    // Much lighter, floaty gravity
-        this.setMaxVelocity(400, 600); // Prevents you from ever sinking too fast
-        
-        // Tightened hitbox (1254x1254 is overall size)
+        this.body.setGravityY(235);    // Reduced by 5% for better float
+        this.setMaxVelocity(400, 500); // Prevents you from ever sinking too fast
+
+        // Tightened hitbox
         this.body.setSize(this.width * 0.6, this.height * 0.6);
         this.body.setOffset(this.width * 0.2, this.height * 0.2);
 
@@ -90,8 +90,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         Soundscape.setThrusting(isThrusting);
         if (isThrusting) {
             // Emit sparks based on thrusting state
-            // Offset spark position based on flipX
-            const sparkX = this.x + (this.flipX ? 35 : -35);
+            // Offset spark position based on flipX (recalibrated for tiny scale)
+            const sparkX = this.x + (this.flipX ? 15 : -15);
             const sparkY = this.y;
             this.sparks.emitParticleAt(sparkX, sparkY, 1);
         }
@@ -117,9 +117,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.scene.cameras.main.shake(100, 0.005);
 
-        // Shoot straight ahead (0 degrees if Right, 180 if Left)
+        // Shoot straight ahead (recalibrated offset for tiny scale)
         const angle = this.flipX ? Math.PI : 0;
-        const spawnX = this.x + (this.flipX ? -75 : 75);
+        const spawnX = this.x + (this.flipX ? -30 : 30);
         const spawnY = this.y + 10;
 
         new Laser(this.scene, spawnX, spawnY, angle);

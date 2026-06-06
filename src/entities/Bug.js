@@ -25,14 +25,14 @@ export default class Bug extends Phaser.Physics.Arcade.Sprite {
         this.body.setImmovable(true);
 
         // Simple movement: Tween between targets or patrol
-        this.patrolDistance = 300;
+        this.patrolDistance = 450; // Vastly wider patrol
         this.startX = x;
         this.setFlipX(false);
 
         this.patrolTween = scene.tweens.add({
             targets: this,
             x: x + this.patrolDistance,
-            duration: 3000,
+            duration: 4000, // Adjusted for the wider sweep
             yoyo: true,
             repeat: -1,
             ease: 'Sine.easeInOut',
