@@ -29,7 +29,7 @@ export default class Preload extends Phaser.Scene {
         this.load.image('rock_crystal_tile', '/assets/rock_crystal_tile.png');
         this.load.image('hazard_cube', '/assets/hazard_cube.png');
         this.load.image('hazard_block', '/assets/hazard_block.png');
-        this.load.image('cpu_block', '/assets/cpu_block.png');
+        this.load.image('cpu_block', '/assets/cpu-sprite-transparent.png');
         this.load.image('drone_enemy', '/assets/drone_enemy.png');
         this.load.image('bug_enemy_up', '/assets/bug_enemy_up.png');
         this.load.image('bug_enemy_down', '/assets/bug_enemy_down.png');
