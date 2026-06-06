@@ -62,5 +62,37 @@ export const levels = [
             "....................................................................................................................................................................................",
             "...................................................................................................................................................................................."
         ]
+    },
+    {
+        levelNumber: 3,
+        escapeTime: 160,
+        map: [
+            "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+            "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+            "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+            "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH.......................HHHHHHHHHHHHHHHHHHH................................................HHHHHHHHHHHHHHHHHHHHHH.............................HHHH",
+            "HHH.......................................................HHHHHHHHHHHHHHHHHHH................................................HHHHHHHHHHHHHHHHHHHHHH.............................HHHH",
+            "HHH.......S..........B....................................HHHHHHHHHHHHHHHHHHH....................E...........................HHHHHHHHHHHHHHHHHHHHHH.............................HHHH",
+            "HHH.......................................................HHHHHHHHHHHHHHHHHHH................................................HHHHHHHHHHHHHHHHHHHHHH.............................HHHH",
+            "HHH.......................................................HHHHHHHHHHHHHHHHHHH...................................................................................................HHHH",
+            "HHH.......................................................HHHHHHHHHHHHHHHHHHH...................................................................................................HHHH",
+            "HHH.......................................R.......................................................................................................................E.............HHHH",
+            "HHH.............................................................................................HHHHHHHHHH......................................................................HHHH",
+            "HHH.............................................................................................HHHHHHHHHH......................................................................HHHH",
+            "HHH.............................................................................................HHHHHHHHHH............................................HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+            "HHH.............................................................................................HHHHHHHHHH............................................HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+            "HHH.............................................................................................HHHHHHHHHH............................................HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+            "HHH..................................XXXXXXXXXXXXXXXXXXXX..............................................................R....................................................C...HHHH",
+            "HHH..................................XXXXXXXXXXXXXXXXXXXX.......................................................................................................................HHHH",
+            "HHH..................................XXXXXXXXXXXXXXXXXXXX.......................XXXXXXXXXX......................................................................................HHHH",
+            "HHH..................................XXXXXXXXXXXXXXXXXXXX.......................XXXXXXXXXX.......................................XXXXXXXXXXXXXXXXXX.............................HHHH",
+            "HHH..................................XXXXXXXXXXXXXXXXXXXX.......................XXXXXXXXXX.......................................XXXXXXXXXXXXXXXXXX.............................HHHH",
+            "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "....................................................................................................................................................................................",
+            "....................................................................................................................................................................................",
+            "....................................................................................................................................................................................",
+            "...................................................................................................................................................................................."
+        ]
     }
 ];

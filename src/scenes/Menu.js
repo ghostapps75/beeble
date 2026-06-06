@@ -28,6 +28,11 @@ export default class Menu extends Phaser.Scene {
             fill: '#ffffff'
         }).setOrigin(1, 0.5);
 
+        const instructionsText = this.add.text(width - 150, height - 100, 'CONTROLS: CURSORS TO MOVE, SPACEBAR TO SHOOT', {
+            font: '24px monospace',
+            fill: '#00ffff'
+        }).setOrigin(1, 0.5);
+
         this.tweens.add({
             targets: ctaText,
             alpha: { from: 0.3, to: 1.0 },
@@ -47,6 +52,11 @@ export default class Menu extends Phaser.Scene {
         // Developer shortcut to start at Level 2
         this.input.keyboard.once('keydown-TWO', () => {
             this.scene.start('Play', { levelIndex: 1, score: 0, lives: 3 });
+        });
+
+        // Developer shortcut to start at Level 3
+        this.input.keyboard.once('keydown-THREE', () => {
+            this.scene.start('Play', { levelIndex: 2, score: 0, lives: 3 });
         });
     }
 

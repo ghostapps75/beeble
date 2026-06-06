@@ -226,6 +226,17 @@ export default class Play extends Phaser.Scene {
                     newCrystal.body.setAllowGravity(false).setImmovable(true);
                     this.crystalsGroup.add(newCrystal);
                     this.tweens.add({ targets: newCrystal, y: y - 10, duration: 1000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+                } else if (char === 'H') {
+                    const haz = this.hazards.create(x, y, 'cloud_hazard');
+                    // Scale to 2x2 cells to make it fluffy and overlapping
+                    haz.setDisplaySize(this.cellW * 2, this.cellH * 2); 
+                    
+                    // Slightly tighter physical hitbox so players don't die on the anti-aliased edges
+                    haz.body.setSize(this.cellW * 1.2, this.cellH * 1.2);
+                    haz.body.setAllowGravity(false).setImmovable(true);
+                    
+                    // Subtle pulsing opacity to make it look like a living, toxic gas cloud
+                    this.tweens.add({ targets: haz, alpha: { from: 0.7, to: 1.0 }, duration: 2000, yoyo: true, repeat: -1 });
                 } else if (char === 'E') {
                     new Bug(this, x, y);
                 } else if (char === 'R') {
