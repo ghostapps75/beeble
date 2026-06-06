@@ -2,22 +2,18 @@ import Phaser from 'phaser';
 
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, isPatrolling = false) {
-        const enemyType = Phaser.Math.Between(1, 3);
-        const textureKey = `enemy${enemyType}`;
+        const textureKey = 'drone_enemy';
         
         super(scene, x, y, textureKey);
         
-        // Scale high-res sprites down
-        this.setScale(0.12);
+        this.setDisplaySize(120, 120); 
         
         scene.add.existing(this);
         scene.physics.add.existing(this);
         scene.enemies.add(this);
         
-        if (this.preFX) this.preFX.addBloom(0xff00ff, 1, 1, 2, 1.2);
+        if (this.preFX) this.preFX.addBloom(0x00ffff, 1, 1, 2, 1.2);
         
-        // Tighten hitbox after physics body is created
-        this.setBodySize(this.width * 0.8, this.height * 0.8);
 
         this.body.setAllowGravity(false);
         this.body.setImmovable(true);
@@ -54,7 +50,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
                 blendMode: 'ADD',
                 lifespan: 500
             });
-            if (ring.preFX) ring.preFX.addBloom(0xff00ff, 1, 1, 2, 1.2);
+            if (ring.preFX) ring.preFX.addBloom(0x00ffff, 1, 1, 2, 1.2);
             ring.explode(15);
             this.scene.time.delayedCall(500, () => ring.destroy());
         }

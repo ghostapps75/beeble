@@ -5,14 +5,14 @@ export default class Laser extends Phaser.Physics.Arcade.Sprite {
         // Create simple laser texture if it doesn't exist
         if (!scene.textures.exists('laser_tex')) {
             const graphics = scene.add.graphics();
-            graphics.fillStyle(0xff8800, 1);
-            graphics.fillRect(0, 0, 20, 6);
-            graphics.generateTexture('laser_tex', 20, 6);
+            graphics.fillStyle(0xff0000, 1);
+            graphics.fillRect(0, 0, 25, 3);
+            graphics.generateTexture('laser_tex', 25, 3);
             graphics.destroy();
         }
 
         super(scene, x, y, 'laser_tex');
-        if (this.preFX) this.preFX.addBloom(0xff4400, 1, 1, 3, 1.2);
+        if (this.preFX) this.preFX.addBloom(0xff0000, 1, 1, 3, 1.2);
 
         scene.add.existing(this);
         scene.lasers.add(this);

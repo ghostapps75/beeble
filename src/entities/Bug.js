@@ -2,30 +2,24 @@ import Phaser from 'phaser';
 
 export default class Bug extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
-        super(scene, x, y, 'bug_sprites', 0);
+        super(scene, x, y, 'bug_enemy_up');
 
-        // Scale high-res bug (~970px wide) down to a manageable size (~80px)
-        this.setScale(0.08);
+        this.setDisplaySize(100, 100); 
+        // Phaser automatically scales the physics body when setDisplaySize is used!
 
-        // Define Animations if needed
-        if (!scene.anims.exists('bug_wiggle')) {
-            scene.anims.create({
-                key: 'bug_wiggle',
-                frames: scene.anims.generateFrameNumbers('bug_sprites', { start: 0, end: 2 }),
-                frameRate: 10,
-                repeat: -1
-            });
-        }
-
-        this.play('bug_wiggle');
+        // Simple animation toggling between two images
+        this.flapTimer = scene.time.addEvent({
+            delay: 175,
+            callback: () => {
+                this.setTexture(this.texture.key === 'bug_enemy_up' ? 'bug_enemy_down' : 'bug_enemy_up');
+            },
+            loop: true
+        });
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
         scene.enemies.add(this);
 
-        // Tighten hitbox
-        this.setBodySize(800, 400);
-        this.setOffset(80, 40);
 
         this.body.setAllowGravity(false);
         this.body.setImmovable(true);
@@ -72,6 +66,7 @@ export default class Bug extends Phaser.Physics.Arcade.Sprite {
             boom.explode(15);
             this.scene.time.delayedCall(600, () => boom.destroy());
         }
+        if (this.flapTimer) this.flapTimer.destroy();
         this.patrolTween.stop();
         this.destroy();
     }

@@ -6,7 +6,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
         super(scene, x, y, 'player');
         
-        // Scale down the high-res 807x300 image
+        // Scale down the high-res 1254x1254 image
         this.setScale(0.18); 
 
         scene.add.existing(this);
@@ -17,21 +17,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Physics properties - No Rotation!
         this.setCollideWorldBounds(true);
         this.setBounce(0.3); 
-        this.setDrag(120, 120); // Uniform horizontal/vertical drifting
-        this.setMaxVelocity(400, 450); // Capped for 1983 precision feel
-        this.body.setGravityY(450); // Consistent "sinking" weight
+        // --- DIALED-IN ARCADE PHYSICS ---
+        this.setDrag(120, 0);          // Zero vertical drag so you fall smoothly
+        this.body.setGravityY(500);    // Much lighter, floaty gravity
+        this.setMaxVelocity(400, 600); // Prevents you from ever sinking too fast
         
-        // Tightened hitbox (807x300 is overall size)
-        // Ignoring the flame on the left and muzzle flash on the right
-        this.setBodySize(380, 240); 
-        this.setOffset(220, 30); // Skip flame on left (0-200px)
+        // Tightened hitbox (1254x1254 is overall size)
+        this.body.setSize(this.width * 0.6, this.height * 0.6);
+        this.body.setOffset(this.width * 0.2, this.height * 0.2);
 
         // Movement variables
-        this.thrustForce = 1200;
+        this.thrustForce = 1100;       // Strong enough to catch yourself quickly
         this.horizontalAcceleration = 1200; // Equalized with thrust
 
         // Game State properties
-        this.maxFuel = 1000;
+        this.maxFuel = 4000;
         this.fuel = this.maxFuel;
         this.isDead = false;
         this.lastShotTime = 0;
@@ -58,8 +58,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             return;
         }
 
-        let drainRate = 15;
         let isThrusting = false;
+        let drainRate = 2; // Base idle drain
         const mobile = this.scene.mobileInput || {};
 
         // --- Horizontal Movement & Orientation ---
@@ -67,12 +67,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setAccelerationX(-this.horizontalAcceleration);
             this.setFlipX(true);
             isThrusting = true;
-            drainRate += 25; // Cumulative drain for horizontal
+            drainRate += 5; // Cumulative drain for horizontal
         } else if (this.cursors.right.isDown || this.keys.D.isDown || mobile.right) {
             this.setAccelerationX(this.horizontalAcceleration);
             this.setFlipX(false);
             isThrusting = true;
-            drainRate += 25; // Cumulative drain for horizontal
+            drainRate += 5; // Cumulative drain for horizontal
         } else {
             this.setAccelerationX(0);
         }
@@ -81,7 +81,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.cursors.up.isDown || this.keys.W.isDown || mobile.up) {
             this.setAccelerationY(-this.thrustForce);
             isThrusting = true;
-            drainRate += 50; // Cumulative drain for vertical
+            drainRate += 10; // Cumulative drain for vertical
         } else {
             this.setAccelerationY(0);
         }
@@ -91,8 +91,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (isThrusting) {
             // Emit sparks based on thrusting state
             // Offset spark position based on flipX
-            const sparkX = this.x + (this.flipX ? 20 : -20);
-            const sparkY = this.y + 20;
+            const sparkX = this.x + (this.flipX ? 35 : -35);
+            const sparkY = this.y;
             this.sparks.emitParticleAt(sparkX, sparkY, 1);
         }
 
@@ -119,8 +119,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Shoot straight ahead (0 degrees if Right, 180 if Left)
         const angle = this.flipX ? Math.PI : 0;
-        const spawnX = this.x + (this.flipX ? -30 : 30);
-        const spawnY = this.y ;
+        const spawnX = this.x + (this.flipX ? -75 : 75);
+        const spawnY = this.y + 10;
 
         new Laser(this.scene, spawnX, spawnY, angle);
         Soundscape.playLaser();

@@ -13,6 +13,13 @@ export class SoundscapeManager {
         this.timeRemaining = 0;
     }
 
+    _ensureRunning() {
+        if (!this.ctx) this.init();
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+        }
+    }
+
     init() {
         if (this.ctx) return;
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -42,11 +49,7 @@ export class SoundscapeManager {
     }
 
     setThrusting(thrusting) {
-        if (!this.ctx) this.init();
-        if (this.ctx.state === 'suspended') {
-            // Need user interaction to resume, we will just fail silently until they click if it's suspended
-            this.ctx.resume().catch(()=> {}); 
-        }
+        this._ensureRunning();
 
         if (this.isThrusting === thrusting) return;
         this.isThrusting = thrusting;
@@ -66,7 +69,7 @@ export class SoundscapeManager {
     }
 
     playBounce(velocity) {
-        if (!this.ctx) this.init();
+        this._ensureRunning();
         
         // Map velocity (approx 0 to 1000) to pitch and volume
         const mag = Math.min(velocity, 1000);
@@ -96,7 +99,7 @@ export class SoundscapeManager {
     }
 
     playLaser() {
-        if (!this.ctx) this.init();
+        this._ensureRunning();
 
         try {
             const osc = this.ctx.createOscillator();
@@ -118,7 +121,7 @@ export class SoundscapeManager {
     }
 
     playExplosion() {
-        if (!this.ctx) this.init();
+        this._ensureRunning();
 
         try {
             // White noise for explosion
@@ -151,7 +154,7 @@ export class SoundscapeManager {
     }
 
     startPanicTimer(timeRemaining) {
-        if (!this.ctx) this.init();
+        this._ensureRunning();
         this.stopPanicTimer();
         this.timeRemaining = timeRemaining;
         this.scheduleTick();
@@ -182,7 +185,7 @@ export class SoundscapeManager {
     }
 
     playTick() {
-        if (!this.ctx) return;
+        this._ensureRunning();
         try {
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
