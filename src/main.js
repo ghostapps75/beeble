@@ -5,11 +5,15 @@ import Preload from './scenes/Preload.js';
 import Menu from './scenes/Menu.js';
 import Play from './scenes/Play.js';
 import GameOver from './scenes/GameOver.js';
+import MobileUIScene from './scenes/MobileUIScene.js';
+
+const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+window.isMobile = isMobile; // Export globally for scenes
 
 const config = {
     type: Phaser.AUTO,
     parent: 'game-container',
-    width: 1920,
+    width: isMobile ? 2340 : 1920,
     height: 1080,
     backgroundColor: '#0a0a0a',
     scale: {
@@ -23,7 +27,7 @@ const config = {
             gravity: { y: 0 } // Player handles its own gravity now
         }
     },
-    scene: [Boot, Preload, Menu, Play, GameOver]
+    scene: [Boot, Preload, Menu, Play, GameOver, MobileUIScene]
 };
 
 const game = new Phaser.Game(config);

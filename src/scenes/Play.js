@@ -30,8 +30,13 @@ export default class Play extends Phaser.Scene {
         this.escapeTimeMax = levelData.escapeTime || 40;
         this.escapeTime = this.escapeTimeMax;
 
-        const width = this.cameras.main.width;
-        const height = this.cameras.main.height;
+        const width = 1920; // Hardcode inner gameplay width
+        const height = 1080;
+
+        // Ensure main camera is a 16:9 window in the center of the dynamic canvas
+        const canvasWidth = this.scale.width;
+        const offsetX = (canvasWidth - 1920) / 2;
+        this.cameras.main.setViewport(offsetX, 0, 1920, 1080);
 
         // --- Dynamic Level Bounds ---
         const cols = this.levelData.map ? this.levelData.map[0].length : 50;
@@ -119,6 +124,11 @@ export default class Play extends Phaser.Scene {
 
         // --- HUD ---
         this.create1983HUD();
+
+        // --- Mobile UI ---
+        if (window.isMobile) {
+            this.scene.launch('MobileUIScene');
+        }
 
         // Audio Context Failsafe
         if (this.sound && this.sound.context && this.sound.context.state === 'suspended') {
@@ -281,8 +291,8 @@ export default class Play extends Phaser.Scene {
     }
 
     create1983HUD() {
-        const width = this.cameras.main.width;
-        const height = this.cameras.main.height;
+        const width = 1920; // Hardcode HUD width
+        const height = 1080;
         const hudH = height * 0.2;
         const hudY = height * 0.8;
 
@@ -343,8 +353,22 @@ export default class Play extends Phaser.Scene {
 
         if (this.isGameOver || this.isDying) return;
 
+        // Fetch mobile UI states
+        const mobileUI = this.scene.get('MobileUIScene');
+        if (mobileUI && mobileUI.states) {
+            this.mobileInput = mobileUI.states;
+        }
+
         if (this.player && !this.player.isDead) {
             this.player.update(time, delta);
+
+            // Establish Strict Physics Overrides for Up Jet
+            if (this.mobileInput && this.mobileInput.isUpJetDown) {
+                // Precision vertical ascent
+                this.player.setVelocityY(-600);
+                // Override standard thrust acceleration
+                this.player.setAccelerationY(0);
+            }
 
             // Crystal Volatility Timer & Follow Logic
             if (this.hasCrystal && this.crystal) {

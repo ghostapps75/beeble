@@ -26,7 +26,7 @@ export default class Menu extends Phaser.Scene {
         const ctaText = this.add.text(width - 150, height - 150, 'PRESS [SPACE] OR TAP TO START', {
             font: '30px monospace',
             fill: '#ffffff'
-        }).setOrigin(1, 0.5);
+        }).setOrigin(1, 0.5).setInteractive();
 
         const instructionsText = this.add.text(width - 150, height - 100, 'CONTROLS: CURSORS TO MOVE, SPACEBAR TO SHOOT', {
             font: '24px monospace',
@@ -45,7 +45,14 @@ export default class Menu extends Phaser.Scene {
         this.input.keyboard.once('keydown-SPACE', () => {
             this.scene.start('Play', { levelIndex: 0, score: 0, lives: 3 });
         });
-        this.input.once('pointerdown', () => {
+        
+        // Explicit tap area instead of global pointerdown
+        ctaText.once('pointerdown', () => {
+            if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
+                if (!this.scale.isFullscreen) {
+                    this.scale.startFullscreen();
+                }
+            }
             this.scene.start('Play', { levelIndex: 0, score: 0, lives: 3 });
         });
         
