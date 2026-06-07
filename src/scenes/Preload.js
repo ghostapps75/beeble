@@ -40,6 +40,8 @@ export default class Preload extends Phaser.Scene {
         this.load.image('gem_icon', '/assets/gem_icon.png');
         this.load.image('crystal', '/assets/crystal.png');
         this.load.image('cloud_hazard', '/assets/cloud_hazasrd.PNG');
+        this.load.image('hazard_edge', '/assets/hazard_edge.png');
+        this.load.image('hazard_edge2', '/assets/hazard_edge2.png');
     }
 
     create() {

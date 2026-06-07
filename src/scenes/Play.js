@@ -134,6 +134,38 @@ export default class Play extends Phaser.Scene {
         if (this.sound && this.sound.context && this.sound.context.state === 'suspended') {
             this.sound.context.resume();
         }
+
+        // --- Level Start Overlay ---
+        this.isGameStarted = true;
+        if (this.levelIndex === 0) { // level 1
+            this.isGameStarted = false;
+            this.physics.pause();
+            
+            const cx = width / 2;
+            const cy = height / 2;
+            
+            this.startOverlay = this.add.container(cx, cy).setScrollFactor(0).setDepth(3000);
+            
+            const bgBox = this.add.rectangle(0, 0, 1100, 300, 0x000000, 0.8).setOrigin(0.5);
+            bgBox.setStrokeStyle(4, 0x00ffff);
+            
+            const title = this.add.text(0, -60, 'FIND THE CRYSTAL AND RETURN IT TO THE CPU.', {
+                font: 'bold 36px monospace', fill: '#00ffff', align: 'center', wordWrap: { width: 1000 }
+            }).setOrigin(0.5);
+            
+            const subtitle = this.add.text(0, 20, 'Use Cursor Keys/Joystick to thrust. Use Spacebar/FIRE to shoot.', {
+                font: '24px monospace', fill: '#ffffff', align: 'center'
+            }).setOrigin(0.5);
+            
+            const prompt = this.add.text(0, 100, 'PRESS [SPACE] OR [FIRE] TO START', {
+                font: 'bold 32px monospace', fill: '#ff0000', align: 'center'
+            }).setOrigin(0.5);
+            
+            this.tweens.add({ targets: prompt, alpha: 0.2, duration: 800, yoyo: true, repeat: -1 });
+            
+            this.startOverlay.add([bgBox, title, subtitle, prompt]);
+            this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        }
     }
 
     createLevelFromGrid() {
@@ -237,7 +269,7 @@ export default class Play extends Phaser.Scene {
                     this.crystalsGroup.add(newCrystal);
                     this.tweens.add({ targets: newCrystal, y: y - 10, duration: 1000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
                 } else if (char === 'H') {
-                    const haz = this.hazards.create(x, y, 'cloud_hazard');
+                    const haz = this.hazards.create(x, y, 'hazard_edge2');
                     // Scale to 2x2 cells to make it fluffy and overlapping
                     haz.setDisplaySize(this.cellW * 2, this.cellH * 2); 
                     
@@ -252,9 +284,21 @@ export default class Play extends Phaser.Scene {
                 } else if (char === 'R') {
                     new Enemy(this, x, y, true);
                 } else if (char === 'B') {
-                    this.forcefield = this.add.sprite(x, y, 'cpu_block');
-                    this.forcefield.setDisplaySize(this.cellW * 8, this.cellH * 8); // Giant Safe Zone Base
-                    this.forcefield.setTint(0x00ff00);
+                    // Find the floor below B to place it perfectly flat on the rocks
+                    let floorRow = r;
+                    for (let f = r; f < rows; f++) {
+                        if (grid[f][c] === 'X') {
+                            floorRow = f;
+                            break;
+                        }
+                    }
+                    const spriteH = this.cellH * 5;
+                    const floorY = floorRow * this.cellH; 
+                    const placeY = floorY - (spriteH / 2);
+                    
+                    this.forcefield = this.add.sprite(x, placeY, 'cpu_block');
+                    this.forcefield.displayHeight = spriteH;
+                    this.forcefield.scaleX = this.forcefield.scaleY;
                     this.physics.add.existing(this.forcefield, true);
                 } else if (char === 'S') {
                     // Player Start
@@ -265,6 +309,37 @@ export default class Play extends Phaser.Scene {
                 c++; // manually advance for non-contiguous items
             }
         }
+
+        // Add random spark emitter for hazard clouds
+        this.hazardSparkEmitter = this.add.particles(0, 0, 'player_tex', {
+            speed: { min: 50, max: 150 },
+            scale: { start: 0.1, end: 0 },
+            alpha: { start: 1, end: 0 },
+            blendMode: 'ADD',
+            lifespan: 300,
+            tint: 0x00ffff,
+            emitting: false
+        });
+        this.hazardSparkEmitter.setDepth(200);
+
+        this.time.addEvent({
+            delay: 50,
+            loop: true,
+            callback: () => {
+                const hazards = this.hazards.getChildren();
+                if (hazards.length === 0) return;
+                
+                // Shoot 2 sparks per 50ms from random hazard blocks
+                for (let i = 0; i < 2; i++) {
+                    const haz = Phaser.Utils.Array.GetRandom(hazards);
+                    if (haz.active) {
+                        const sx = haz.x + Phaser.Math.Between(-this.cellW, this.cellW);
+                        const sy = haz.y + Phaser.Math.Between(-this.cellH, this.cellH);
+                        this.hazardSparkEmitter.emitParticleAt(sx, sy, 1);
+                    }
+                }
+            }
+        });
     }
 
     destroyWall(wall) {
@@ -357,6 +432,19 @@ export default class Play extends Phaser.Scene {
         const mobileUI = this.scene.get('MobileUIScene');
         if (mobileUI && mobileUI.states) {
             this.mobileInput = mobileUI.states;
+        }
+
+        if (!this.isGameStarted) {
+            const spaceDown = this.spaceKey && Phaser.Input.Keyboard.JustDown(this.spaceKey);
+            const mobileFire = this.mobileInput && this.mobileInput.fire;
+            
+            if (spaceDown || mobileFire) {
+                this.isGameStarted = true;
+                if (this.startOverlay) this.startOverlay.destroy();
+                this.physics.resume();
+                if (this.mobileInput) this.mobileInput.fire = false; // consume the fire input
+            }
+            return;
         }
 
         if (this.player && !this.player.isDead) {

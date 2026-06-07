@@ -31,7 +31,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.horizontalAcceleration = 1200; // Equalized with thrust
 
         // Game State properties
-        this.maxFuel = 4000;
+        this.maxFuel = 400;
         this.fuel = this.maxFuel;
         this.isDead = false;
         this.lastShotTime = 0;
